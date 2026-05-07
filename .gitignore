@@ -7,6 +7,5 @@ outputs/
 
 # ملفات الديتا الكبيرة
 
-dataset/Resume_Dataset/
 dataset/Job_description/
 .ipynb_checkpoints/
