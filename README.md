@@ -162,7 +162,30 @@ pip install -r requirements.txt
 
 ---
 
-## 3. Create Environment Variables
+## 3. Download Dataset
+
+The dataset is **not included** in the repository due to its size. Download it manually from Kaggle:
+
+1. Go to: [Resume Dataset on Kaggle](https://www.kaggle.com/datasets/snehaanbhawal/resume-dataset)
+2. Download and extract the zip file
+3. Place the extracted folder inside `dataset/` so the structure looks like:
+
+```
+CV-Agent/
+└── dataset/
+    └── Resume_Dataset/
+        ├── Resume/
+        │   └── Resume.csv
+        └── data/
+            └── data/
+                ├── ACCOUNTANT/
+                ├── ENGINEER/
+                └── ...
+```
+
+---
+
+## 4. Create Environment Variables
 
 Create `.env` file:
 
