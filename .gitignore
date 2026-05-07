@@ -4,3 +4,9 @@ __pycache__/
 .venv/
 venv/
 outputs/
+
+# ملفات الديتا الكبيرة
+dataset/*.zip
+dataset/Resume_Dataset/
+dataset/Job_description/
+.ipynb_checkpoints/
