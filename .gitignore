@@ -8,5 +8,27 @@ outputs/
 # ملفات الديتا الكبيرة
 
 dataset/Job_description/
-dataset/Resume_Dataset/
+
+# Resume_Dataset - only HR, TEACHER, INFORMATION-TECHNOLOGY are tracked
+dataset/Resume_Dataset/data/data/ACCOUNTANT/
+dataset/Resume_Dataset/data/data/ADVOCATE/
+dataset/Resume_Dataset/data/data/AGRICULTURE/
+dataset/Resume_Dataset/data/data/APPAREL/
+dataset/Resume_Dataset/data/data/ARTS/
+dataset/Resume_Dataset/data/data/AUTOMOBILE/
+dataset/Resume_Dataset/data/data/AVIATION/
+dataset/Resume_Dataset/data/data/BANKING/
+dataset/Resume_Dataset/data/data/BPO/
+dataset/Resume_Dataset/data/data/BUSINESS-DEVELOPMENT/
+dataset/Resume_Dataset/data/data/CHEF/
+dataset/Resume_Dataset/data/data/CONSTRUCTION/
+dataset/Resume_Dataset/data/data/CONSULTANT/
+dataset/Resume_Dataset/data/data/DESIGNER/
+dataset/Resume_Dataset/data/data/DIGITAL-MEDIA/
+dataset/Resume_Dataset/data/data/ENGINEERING/
+dataset/Resume_Dataset/data/data/FINANCE/
+dataset/Resume_Dataset/data/data/FITNESS/
+dataset/Resume_Dataset/data/data/HEALTHCARE/
+dataset/Resume_Dataset/data/data/PUBLIC-RELATIONS/
+dataset/Resume_Dataset/data/data/SALES/
 .ipynb_checkpoints/
