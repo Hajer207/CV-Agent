@@ -1,29 +1,34 @@
-from cv_agent.agents.base_agent import BaseAgent
-from cv_agent.model import analyze_cv, generate_interview_questions, get_match_score
-from cv_agent.services.vector_store import get_rag_context
+from agents.base_agent import BaseAgent
+from model import (
+    analyze_cv,
+    get_match_score,
+    generate_interview_questions
+)
 
 
 class AnalyzerAgent(BaseAgent):
-    def __init__(self, use_rag: bool = True):
-        super().__init__("AnalyzerAgent")
+    def __init__(self, use_rag=False):
+        super().__init__(name="AnalyzerAgent")
         self.use_rag = use_rag
 
-    def run(self, cv_text: str, job_description: str) -> dict:
-        """Analyze a CV against a job description and return a result dict."""
-        rag_context = ""
-        if self.use_rag:
-            self._log("Fetching RAG context from vector database")
-            rag_context = get_rag_context(job_description)
+    def run(self, cv_text, job_description, cv_id="uploaded_cv"):
+        self.log("Analyzing CV...")
 
-        self._log("Analyzing CV with AI")
-        report = analyze_cv(cv_text, job_description, rag_context)
+        report = analyze_cv(
+            cv_text=cv_text,
+            job_description=job_description
+        )
+
         score = get_match_score(report)
 
-        self._log("Generating interview questions")
-        questions = generate_interview_questions(cv_text, job_description)
+        questions = generate_interview_questions(
+            cv_text=cv_text,
+            job_description=job_description
+        )
 
         return {
-            "report": report,
+            "cv_id": cv_id,
             "score": score,
-            "interview_questions": questions,
+            "report": report,
+            "interview_questions": questions
         }

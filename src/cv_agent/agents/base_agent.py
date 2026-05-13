@@ -1,13 +1,9 @@
-from abc import ABC, abstractmethod
-
-
-class BaseAgent(ABC):
-    def __init__(self, name: str):
+class BaseAgent:
+    def __init__(self, name):
         self.name = name
 
-    @abstractmethod
-    def run(self, *args, **kwargs):
-        pass
-
-    def _log(self, message: str) -> None:
+    def log(self, message):
         print(f"[{self.name}] {message}")
+
+    def run(self, *args, **kwargs):
+        raise NotImplementedError("Subclasses must implement run()")
