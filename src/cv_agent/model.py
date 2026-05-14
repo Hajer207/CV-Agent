@@ -1,6 +1,5 @@
 import re
-
-from services.llm import ask_ai
+from cv_agent.services.llm import ask_ai
 
 
 def analyze_cv(cv_text, job_description):
@@ -9,13 +8,16 @@ You are an expert HR recruiter and career coach.
 
 Analyze the following CV against the provided job description.
 
-Return:
-1. Match Score (0-100)
-2. Skills Found
-3. Missing Skills
-4. Strengths
-5. Weaknesses
-6. Recommendations
+IMPORTANT:
+Start your answer exactly with:
+Match Score: X%
+
+Then continue with:
+Skills Found:
+Missing Skills:
+Strengths:
+Weaknesses:
+Recommendations:
 
 CV:
 {cv_text[:3000]}
@@ -25,20 +27,15 @@ Job Description:
 """
 
     response = ask_ai(prompt)
-
     return response
 
 
 def get_match_score(report):
-    match = re.search(r'(\d{1,3})', report)
+    match = re.search(r"Match Score:\s*(\d{1,3})\s*%", report, re.IGNORECASE)
 
     if match:
         score = int(match.group(1))
-
-        if score > 100:
-            score = 100
-
-        return score
+        return min(score, 100)
 
     return 75
 
@@ -46,6 +43,7 @@ def get_match_score(report):
 def generate_interview_questions(cv_text, job_description):
     prompt = f"""
 Generate 5 interview questions for this candidate based on the CV and job description.
+Return the questions as a clean numbered list only.
 
 CV:
 {cv_text[:2500]}
@@ -55,7 +53,6 @@ Job Description:
 """
 
     response = ask_ai(prompt)
-
     return response
 
 
@@ -68,5 +65,4 @@ CV:
 """
 
     response = ask_ai(prompt)
-
     return response

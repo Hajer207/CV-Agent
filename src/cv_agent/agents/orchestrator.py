@@ -1,7 +1,6 @@
-from agents.parser_agent import ParserAgent
-from agents.analyzer_agent import AnalyzerAgent
-from agents.matcher_agent import MatcherAgent
-
+from cv_agent.agents.parser_agent import ParserAgent
+from cv_agent.agents.matcher_agent import MatcherAgent
+from cv_agent.agents.analyzer_agent import AnalyzerAgent
 
 class Orchestrator:
     def __init__(self, use_rag=False):

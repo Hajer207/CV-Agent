@@ -1,5 +1,6 @@
-from agents.base_agent import BaseAgent
-from model import (
+from cv_agent.agents.base_agent import BaseAgent
+
+from cv_agent.model import (
     analyze_cv,
     get_match_score,
     generate_interview_questions

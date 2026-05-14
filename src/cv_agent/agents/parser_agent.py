@@ -1,5 +1,5 @@
-from agents.base_agent import BaseAgent
-from services.parser import parse_cv
+from cv_agent.agents.base_agent import BaseAgent
+from cv_agent.services.parser import parse_cv
 
 
 class ParserAgent(BaseAgent):

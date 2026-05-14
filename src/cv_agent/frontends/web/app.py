@@ -1,14 +1,32 @@
 import os
 import sys
+import re
+import tempfile
+from pathlib import Path
+
 import streamlit as st
 import pandas as pd
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+# Make src available so imports work when running Streamlit directly
+ROOT_DIR = Path(__file__).resolve().parents[4]
+SRC_DIR = ROOT_DIR / "src"
+sys.path.append(str(SRC_DIR))
 
 try:
-    from agents.orchestrator import Orchestrator
+    from cv_agent.agents.orchestrator import Orchestrator
 except Exception:
     Orchestrator = None
+
+try:
+    from cv_agent.services.email_service import send_report_to_candidate, send_summary_to_hr
+except Exception:
+    send_report_to_candidate = None
+    send_summary_to_hr = None
+
+try:
+    from cv_agent.services.llm import ask_ai
+except Exception:
+    ask_ai = None
 
 
 st.set_page_config(
@@ -198,6 +216,113 @@ def get_demo_hr_result():
     }
 
 
+
+def _extract_lines_from_section(text, start_title, end_titles):
+    """Extract bullet-like lines from a plain text AI report section."""
+    if not text:
+        return []
+
+    end_pattern = "|".join([re.escape(title) + r"\s*:" for title in end_titles])
+    pattern = re.escape(start_title) + r"\s*:\s*(.*?)(?=" + end_pattern + r"|$)"
+    match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
+
+    if not match:
+        return []
+
+    content = match.group(1).strip()
+    lines = []
+
+    for line in content.splitlines():
+        cleaned = line.strip()
+        cleaned = re.sub(r"^[\-\*\u2022\s]*", "", cleaned)
+        cleaned = re.sub(r"^\d+[\.\)]\s*", "", cleaned).strip()
+
+        if cleaned:
+            lines.append(cleaned)
+
+    return lines
+
+
+def _extract_score_from_report(report, fallback=0):
+    """Extract Match Score safely from an AI report."""
+    if not report:
+        return fallback
+
+    patterns = [
+        r"Match\s*Score\s*:\s*(\d{1,3})\s*%",
+        r"Overall\s*Match\s*:\s*(\d{1,3})\s*%",
+        r"Score\s*:\s*(\d{1,3})\s*%",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, report, re.IGNORECASE)
+        if match:
+            return min(int(match.group(1)), 100)
+
+    return fallback
+
+
+def normalize_candidate_result(result):
+    """
+    Convert the real AI output into the same structure the old demo UI expects.
+    This keeps the old design/templates unchanged while replacing demo data with AI.
+    """
+    if not isinstance(result, dict):
+        report = str(result)
+        score = _extract_score_from_report(report, 0)
+        questions = []
+    else:
+        report = result.get("report", "") or result.get("summary", "") or str(result)
+        score = result.get("score", 0) or _extract_score_from_report(report, 0)
+        questions = result.get("questions", result.get("interview_questions", []))
+
+    if isinstance(questions, str):
+        questions = [
+            re.sub(r"^\d+[\.\)]\s*", "", q.strip())
+            for q in questions.splitlines()
+            if q.strip()
+        ]
+
+    skills_found = _extract_lines_from_section(
+        report,
+        "Skills Found",
+        ["Missing Skills", "Strengths", "Weaknesses", "Recommendations", "Interview Questions"]
+    )
+
+    missing = _extract_lines_from_section(
+        report,
+        "Missing Skills",
+        ["Strengths", "Weaknesses", "Recommendations", "Interview Questions"]
+    )
+
+    tips = _extract_lines_from_section(
+        report,
+        "Recommendations",
+        ["Interview Questions"]
+    )
+
+    # If the model used different labels, keep the UI safe
+    if isinstance(result, dict):
+        skills = result.get("skills", {})
+        if not skills and skills_found:
+            skills = {skill: 80 for skill in skills_found}
+        missing = result.get("missing", missing)
+        tips = result.get("tips", tips)
+    else:
+        skills = {skill: 80 for skill in skills_found}
+
+    summary = report
+
+    return {
+        "score": int(score) if str(score).isdigit() else 0,
+        "skills": skills if isinstance(skills, dict) else {},
+        "missing": missing if isinstance(missing, list) else [],
+        "questions": questions if isinstance(questions, list) else [],
+        "tips": tips if isinstance(tips, list) else [],
+        "summary": summary,
+        "report": report,
+    }
+
 def landing_page():
     st.markdown(
         "<h1 style='text-align: center; color: #006C35; font-size: 60px; font-weight: 800;'>Moeen | مُعين</h1>",
@@ -242,19 +367,29 @@ def landing_page():
 
 
 def candidate_metrics(result):
-    readiness = "Strong 🔥" if result["score"] >= 75 else "Needs Work"
+    result = normalize_candidate_result(result)
+
+    score = result.get("score", 0)
+    missing = result.get("missing", [])
+
+    if score >= 75:
+        readiness = "Strong 🔥"
+    elif score >= 50:
+        readiness = "Moderate"
+    else:
+        readiness = "Needs Work"
 
     m1, m2, m3 = st.columns(3)
 
     with m1:
         st.markdown(
-            f'<div class="metric-card"><b>Overall Match</b><br><h2 style="color:#006C35;">{result["score"]}%</h2></div>',
+            f'<div class="metric-card"><b>Overall Match</b><br><h2 style="color:#006C35;">{score}%</h2></div>',
             unsafe_allow_html=True
         )
 
     with m2:
         st.markdown(
-            f'<div class="metric-card"><b>Missing Skills</b><br><h2 style="color:#F59E0B;">{len(result["missing"])} Gaps</h2></div>',
+            f'<div class="metric-card"><b>Missing Skills</b><br><h2 style="color:#F59E0B;">{len(missing)} Gaps</h2></div>',
             unsafe_allow_html=True
         )
 
@@ -394,15 +529,42 @@ def candidate_portal():
 
             if st.button("Start AI Analysis ✨", use_container_width=True):
                 if uploaded_cv and job_description:
-                    st.session_state.candidate_result = get_demo_candidate_result()
-                    st.success("Demo analysis completed successfully.")
+                    if Orchestrator is None:
+                        st.error("AI Orchestrator is not available. Please check import paths.")
+                        return
+
+                    with st.spinner("Moeen AI is analyzing your CV..."):
+                        suffix = ".pdf" if uploaded_cv.name.lower().endswith(".pdf") else ".docx"
+
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
+                            tmp_file.write(uploaded_cv.getbuffer())
+                            cv_path = tmp_file.name
+
+                        ai_result = Orchestrator().run_single(
+                            cv_path=cv_path,
+                            job_description=job_description,
+                            cv_id=uploaded_cv.name
+                        )
+
+                        ai_result = normalize_candidate_result(ai_result)
+                        st.session_state.candidate_result = ai_result
+
+                        if candidate_email and send_report_to_candidate is not None:
+                            send_report_to_candidate(
+                                candidate_email=candidate_email,
+                                candidate_name="Candidate",
+                                report=ai_result.get("report", ai_result.get("summary", "")),
+                                score=ai_result.get("score", 0)
+                            )
+
+                    st.success("AI analysis completed successfully.")
                     st.rerun()
                 else:
                     st.warning("Please upload your CV and enter the job description.")
 
             if st.session_state.candidate_result is not None and candidate_email:
                 st.markdown(
-                    f"<div class='email-note'>📩 Report prepared for: <b>{candidate_email}</b></div>",
+                    f"<div class='email-note'>📩 Report sent to: <b>{candidate_email}</b></div>",
                     unsafe_allow_html=True
                 )
 
@@ -427,24 +589,39 @@ def candidate_portal():
             </div>
             """, unsafe_allow_html=True)
         else:
-            result = st.session_state.candidate_result
+            result = normalize_candidate_result(st.session_state.candidate_result)
 
             tab1, tab2, tab3 = st.tabs(["Skills Analysis", "Interview Prep", "Tips"])
 
             with tab1:
-                st.write(result["summary"])
+                st.write(result.get("summary", "No summary available."))
 
-                for skill, value in result["skills"].items():
-                    st.write(f"**{skill}**")
-                    st.progress(value)
+                skills = result.get("skills", {})
+                if skills:
+                    for skill, value in skills.items():
+                        st.write(f"**{skill}**")
+                        try:
+                            st.progress(int(value))
+                        except Exception:
+                            st.write(value)
+                else:
+                    st.info("No skills breakdown available.")
 
             with tab2:
-                for question in result["questions"]:
-                    st.write(f"- {question}")
+                questions = result.get("questions", [])
+                if questions:
+                    for question in questions:
+                        st.write(f"- {question}")
+                else:
+                    st.info("No interview questions available.")
 
             with tab3:
-                for tip in result["tips"]:
-                    st.write(f"- {tip}")
+                tips = result.get("tips", [])
+                if tips:
+                    for tip in tips:
+                        st.write(f"- {tip}")
+                else:
+                    st.info("No tips available.")
 
             st.subheader("💬 Chat with Moeen")
 
@@ -455,10 +632,27 @@ def candidate_portal():
                 if st.button("Send Message", key="candidate_chat_btn"):
                     if user_message:
                         st.session_state.chat_history.append(("You", user_message))
-                        st.session_state.chat_history.append((
-                            "Moeen",
-                            "Based on your report, focus on measurable achievements and job-specific keywords."
-                        ))
+
+                        if ask_ai is not None:
+                            report_context = result.get("report", result.get("summary", ""))
+
+                            bot_reply = ask_ai(f"""
+You are Moeen, an AI career coach.
+
+Answer the user's question based on this CV analysis report.
+
+CV Analysis Report:
+{report_context}
+
+User Question:
+{user_message}
+
+Give a helpful, specific, and concise answer.
+""")
+                        else:
+                            bot_reply = "I cannot connect to the AI service right now. Please check the OpenAI setup."
+
+                        st.session_state.chat_history.append(("Moeen", bot_reply))
                         st.rerun()
 
                 for sender, message in st.session_state.chat_history:
