@@ -61,6 +61,13 @@ HR / Candidate Dashboards
 
 ---
 
+## The system includes:
+
+- 3 Core AI Agents
+- 1 Base Agent Architecture
+- 1 Orchestrator Controller
+
+
 # 🔹 Agents Overview
 
 ## Parser Agent
