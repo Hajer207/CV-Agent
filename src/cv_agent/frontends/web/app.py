@@ -626,12 +626,12 @@ def candidate_portal():
             st.subheader("💬 Chat with Moeen")
 
             with st.container(border=True):
-                st.write("**Moeen:** Based on your analysis, I suggest focusing on Data Visualization projects.")
+                st.write("**Moeen:** Do you have any question about your CV analysis?")
                 user_message = st.text_input("Ask Moeen a question...", key="chat_input")
 
                 if st.button("Send Message", key="candidate_chat_btn"):
                     if user_message:
-                        st.session_state.chat_history.append(("You", user_message))
+                        st.session_state.chat_history = [("You", user_message)]
 
                         if ask_ai is not None:
                             report_context = result.get("report", result.get("summary", ""))
@@ -652,12 +652,48 @@ Give a helpful, specific, and concise answer.
                         else:
                             bot_reply = "I cannot connect to the AI service right now. Please check the OpenAI setup."
 
-                        st.session_state.chat_history.append(("Moeen", bot_reply))
+                        st.session_state.chat_history = [
+                         ("You", user_message),
+                         ("Moeen", bot_reply)
+                     ]
                         st.rerun()
 
                 for sender, message in st.session_state.chat_history:
                     st.write(f"**{sender}:** {message}")
 
+
+
+def build_hr_ai_result(ranked_results):
+    """Convert real AI ranked results into the same structure the old HR UI expects."""
+    ranked_results = [normalize_candidate_result(item) | {"cv_id": item.get("cv_id", f"Candidate {i + 1}") if isinstance(item, dict) else f"Candidate {i + 1}"} for i, item in enumerate(ranked_results)]
+    ranked_results = sorted(ranked_results, key=lambda item: item.get("score", 0), reverse=True)
+
+    rows = []
+    for index, item in enumerate(ranked_results, start=1):
+        skills = item.get("skills", {})
+        top_skill = "AI Analysis"
+        if isinstance(skills, dict) and skills:
+            top_skill = next(iter(skills.keys()))
+
+        rows.append({
+            "Rank": f"#{index}",
+            "Candidate": item.get("cv_id", f"Candidate {index}"),
+            "Match": f"{item.get('score', 0)}%",
+            "Top Skill": top_skill,
+        })
+
+    leaderboard = pd.DataFrame(rows, columns=["Rank", "Candidate", "Match", "Top Skill"])
+    best = ranked_results[0] if ranked_results else {}
+
+    return {
+        "total_cvs": len(ranked_results),
+        "top_match": best.get("score", 0),
+        "verified_fits": len([item for item in ranked_results if item.get("score", 0) >= 70]),
+        "best_candidate": best.get("cv_id", "Best Candidate"),
+        "best_reason": best.get("report", best.get("summary", "No report available.")),
+        "leaderboard": leaderboard,
+        "ranked_results": ranked_results,
+    }
 
 def hr_metrics(result):
     h1, h2, h3 = st.columns(3)
@@ -745,15 +781,49 @@ def hr_portal():
 
             if st.button("Run Smart Ranking 🚀", use_container_width=True):
                 if uploaded_files and job_requirements:
-                    st.session_state.hr_result = get_demo_hr_result()
-                    st.success("Demo ranking completed successfully.")
+                    if Orchestrator is None:
+                        st.error("AI Orchestrator is not available. Please check import paths.")
+                        return
+
+                    with st.spinner("Moeen AI is ranking candidates..."):
+                        ai_results = []
+
+                        for uploaded_file in uploaded_files:
+                            suffix = ".pdf" if uploaded_file.name.lower().endswith(".pdf") else ".docx"
+
+                            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
+                                tmp_file.write(uploaded_file.getbuffer())
+                                cv_path = tmp_file.name
+
+                            result = Orchestrator().run_single(
+                                cv_path=cv_path,
+                                job_description=job_requirements,
+                                cv_id=uploaded_file.name
+                            )
+
+                            if isinstance(result, dict):
+                                result["cv_id"] = uploaded_file.name
+
+                            ai_results.append(result)
+
+                        st.session_state.hr_result = build_hr_ai_result(ai_results)
+
+                        if hr_email and send_summary_to_hr is not None:
+                            send_summary_to_hr(
+                                hr_email=hr_email,
+                                candidate_name=st.session_state.hr_result.get("best_candidate", "Best Candidate"),
+                                report=st.session_state.hr_result.get("best_reason", "No report available."),
+                                score=st.session_state.hr_result.get("top_match", 0),
+                            )
+
+                    st.success("AI ranking completed successfully.")
                     st.rerun()
                 else:
                     st.warning("Please upload CVs and enter job requirements.")
 
             if st.session_state.hr_result is not None and hr_email:
                 st.markdown(
-                    f"<div class='email-note'>📩 Ranking report prepared for: <b>{hr_email}</b></div>",
+                    f"<div class='email-note'>📩 Ranking report sent to: <b>{hr_email}</b></div>",
                     unsafe_allow_html=True
                 )
 
@@ -787,11 +857,36 @@ def hr_portal():
 
                 if st.button("Send HR Message", key="hr_chat_btn"):
                     if hr_message:
-                        st.session_state.hr_chat_history.append(("HR", hr_message))
-                        st.session_state.hr_chat_history.append((
-                            "Moeen HR",
-                            f"{result['best_candidate']} is currently the strongest fit based on match score and role alignment."
-                        ))
+                        st.session_state.hr_chat_history = [("HR", hr_message)]
+                        
+                        if ask_ai is not None:
+                            hr_context = result.get("best_reason", "")
+                            leaderboard_context = result.get("leaderboard", pd.DataFrame()).to_string(index=False)
+
+                            bot_reply = ask_ai(f"""
+You are Moeen HR, an AI recruiting assistant.
+
+Answer the HR user's question based on this candidate ranking and best-match report.
+
+Candidate Leaderboard:
+{leaderboard_context}
+
+Best Candidate Report:
+{hr_context}
+
+HR Question:
+{hr_message}
+
+Give a practical, specific, and concise recruiting answer.
+""")
+                        else:
+                            bot_reply = f"{result.get('best_candidate', 'The top candidate')} is currently the strongest fit based on match score and role alignment."
+
+                        st.session_state.hr_chat_history = [
+                        ("HR", hr_message),
+                     ("Moeen HR", bot_reply)
+                         ]
+                        
                         st.rerun()
 
                 for sender, message in st.session_state.hr_chat_history:
