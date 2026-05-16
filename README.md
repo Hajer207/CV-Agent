@@ -1,160 +1,112 @@
-# CV-Agent 📄🤖
+# ✨ Moeen | AI CV-Agent
 
-AI-powered CV Analysis and Matching System using Agentic AI Architecture.
+### Intelligent AI-Powered Recruitment & Career Assistant
 
----
+Moeen is an AI-powered recruitment and career support platform designed to help both job seekers and HR professionals make smarter hiring decisions using Artificial Intelligence.
 
-# 📌 Overview
-
-CV-Agent is an intelligent system designed to analyze resumes (CVs), compare them with job descriptions, and generate professional AI-based evaluations and recommendations.
-
-The project follows an MVC-inspired architecture to separate:
-- AI logic
-- Services
-- Frontend interfaces
-
-This makes the system modular, scalable, and easy to extend.
+The system analyzes CVs, compares them with job descriptions, identifies missing skills, generates interview questions, ranks candidates automatically, and provides personalized career recommendations using OpenAI models and intelligent agent workflows.
 
 ---
 
-# 🎯 Project Goals
+# 🚀 Features
 
-The system aims to:
-
-- Analyze CVs automatically
-- Extract important candidate information
-- Compare CVs with job descriptions
-- Measure candidate-job compatibility
-- Generate AI-based recommendations
-- Help recruiters and applicants make better decisions
-
----
-
-# 🧠 Features
-
-✅ Upload CV files (PDF / DOCX)
-
-✅ Extract text automatically
-
-✅ AI-powered resume analysis
-
-✅ Compare CV with job description
-
-✅ Match score generation
-
-✅ Skill extraction
-
-✅ Missing skills detection
-
-✅ Web chatbot interface
-
-✅ Modular Agentic AI architecture
+## 👤 Job Seeker Portal
+- Upload CVs (PDF / DOCX)
+- AI-powered CV analysis
+- Match score calculation
+- Missing skills detection
+- Personalized improvement recommendations
+- AI-generated interview questions
+- Interactive AI career assistant chatbot
+- Email delivery for analysis reports
 
 ---
 
-# 🏗️ Project Architecture
+## 💼 HR / Recruiter Portal
+- Upload multiple CVs simultaneously
+- AI-based candidate ranking
+- Automatic candidate comparison
+- Best-fit candidate identification
+- Smart recruitment insights
+- AI-powered HR chatbot assistant
+- Email summaries for recruiters
 
-The project uses a modular structure inspired by the MVC Pattern.
+---
 
-```txt
+# 🧠 AI Technologies Used
+
+- OpenAI API
+- GPT-4o-mini
+- Natural Language Processing (NLP)
+- Multi-Agent Architecture
+- Python
+- Streamlit
+- SMTP Email Integration
+
+---
+
+# 🏗️ System Architecture
+
+The project follows a modular AI-agent workflow:
+
+```text
+Parser Agent
+     ↓
+Analyzer Agent
+     ↓
+Matcher Agent
+     ↓
+HR / Candidate Dashboards
+```
+
+---
+
+# 🔹 Agents Overview
+
+## Parser Agent
+Responsible for extracting and processing text from uploaded CV files.
+
+## Analyzer Agent
+Uses OpenAI models to analyze CVs against job descriptions and generate intelligent feedback.
+
+## Matcher Agent
+Ranks and compares candidates based on AI-generated scores and compatibility.
+
+---
+
+# 📂 Project Structure
+
+```text
 CV-Agent/
 │
-├── README.md
-├── .gitignore
-├── .env.example
-├── requirements.txt
+├── src/
+│   ├── cv_agent/
+│   │   ├── agents/
+│   │   ├── services/
+│   │   ├── frontends/
+│   │   ├── model.py
+│   │   └── config.py
 │
 ├── data/
-│   ├── cvs/
-│   └── job_descriptions/
-│
-└── src/
-    └── cv_agent/
-        ├── model.py
-        ├── main.py
-        ├── config.py
-        │
-        ├── services/
-        │   ├── llm.py
-        │   └── parser.py
-        │
-        └── frontends/
-            ├── cli/
-            │   └── main.py
-            │
-            └── web/
-                └── app.py
+├── requirements.txt
+├── README.md
+└── .env
 ```
 
 ---
 
-# 📂 File Structure Explanation
+# ⚙️ Installation & Setup
 
-## model.py
-Contains the AI workflow and business logic.
-
-Responsible for:
-- CV analysis
-- Job matching
-- Recommendation generation
-
----
-
-## config.py
-Loads environment variables and API keys.
-
----
-
-## services/parser.py
-Handles:
-- PDF reading
-- DOCX reading
-- Text extraction
-
----
-
-## services/llm.py
-Handles communication with the AI model provider.
-
-Examples:
-- OpenAI
-- OpenRouter
-- Claude
-- DeepSeek
-
----
-
-## frontends/web/app.py
-Web interface for interacting with the system.
-
-Possible frameworks:
-- Chainlit
-- Streamlit
-
----
-
-# ⚙️ Technologies Used
-
-- Python
-- LangGraph
-- Chainlit
-- OpenAI / OpenRouter APIs
-- PyPDF
-- python-docx
-
----
-
-# 🚀 Installation
-
-## 1. Clone Repository
+## 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/CV-Agent.git
+git clone <repository_url>
+cd CV-Agent
 ```
 
 ---
 
-## 2. Install Dependencies
+## 2️⃣ Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -162,78 +114,87 @@ pip install -r requirements.txt
 
 ---
 
-## 3. Download Dataset
+## 3️⃣ Configure Environment Variables
 
-The dataset is **not included** in the repository due to its size. Download it manually from Kaggle:
-
-1. Go to: [Resume Dataset on Kaggle](https://www.kaggle.com/datasets/snehaanbhawal/resume-dataset)
-2. Download and extract the zip file
-3. Place the extracted folder inside `dataset/` so the structure looks like:
-
-```
-CV-Agent/
-└── dataset/
-    └── Resume_Dataset/
-        ├── Resume/
-        │   └── Resume.csv
-        └── data/
-            └── data/
-                ├── ACCOUNTANT/
-                ├── ENGINEER/
-                └── ...
-```
-
----
-
-## 4. Create Environment Variables
-
-Create `.env` file:
+Create a `.env` file and add:
 
 ```env
-OPENROUTER_API_KEY=your_api_key
-MODEL_NAME=deepseek/deepseek-chat
+OPENAI_API_KEY=your_openai_api_key
+MODEL_NAME=gpt-4o-mini
+
+EMAIL_ADDRESS=your_email@gmail.com
+EMAIL_PASSWORD=your_app_password
 ```
 
 ---
 
-# ▶️ Run Web Interface
+## 4️⃣ Run the Application
 
 ```bash
-python src/cv_agent/frontends/web/app.py
+streamlit run src/cv_agent/frontends/web/app.py
 ```
 
 ---
 
-# 📊 Example Workflow
+# 📧 Email Integration
 
-1. Upload CV
-2. Upload Job Description
-3. Extract text
-4. Analyze skills and experience
-5. Compare with job requirements
-6. Generate match score and recommendations
+The system supports automatic email delivery for:
+- Candidate CV analysis reports
+- HR ranking summaries
 
----
-
-# 🔮 Future Improvements
-
-- Vector database integration
-- RAG pipeline
-- Interview question generation
-- Multi-agent workflow
-- Dashboard analytics
-- Telegram integration
+Implemented using:
+- Gmail SMTP
+- App Password Authentication
 
 ---
 
-# 👩‍💻 Team
+# 🎯 Project Objectives
 
-Graduation Project — AI & Data Track
-
-Developed using Agentic AI concepts and modern AI application architecture.
+- Improve recruitment efficiency
+- Assist candidates in CV optimization
+- Automate candidate screening
+- Reduce manual HR workload
+- Enhance hiring accuracy using AI
 
 ---
 
-# 📄 License
+# 🖥️ User Experience
 
-This project is for educational and academic purposes.
+The platform provides:
+- Interactive dashboards
+- AI-generated insights
+- Real-time feedback
+- Conversational AI assistance
+- Modern and user-friendly UI
+
+---
+
+# 👩‍💻 Team Members
+
+- Hajer
+- Seba
+- Shaima
+- Sahad
+
+---
+
+# 📌 Future Improvements
+
+- ATS compatibility scoring
+- LinkedIn profile analysis
+- AI-generated cover letters
+- Voice interview simulation
+- Advanced analytics dashboard
+- Cloud deployment
+
+---
+
+# 📜 License
+
+This project was developed for educational and academic purposes.
+
+---
+
+# 💚 Moeen | مُعين
+
+### Empowering Careers with Artificial Intelligence ✨
