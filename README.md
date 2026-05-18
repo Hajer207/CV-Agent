@@ -181,7 +181,7 @@ The platform provides:
 - Hajer
 - Seba
 - Shaima
-- Sahad
+- Shahad
 
 ---
 
