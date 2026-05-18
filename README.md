@@ -375,9 +375,9 @@ What responsibilities are included in this role?
 
 ---
 
-# 👩‍💻 Engineering Team
+# 👩‍💻 Development Team
 
-| Team Member |
+| Developer |
 |---|
 | Hajer |
 | Seba |
