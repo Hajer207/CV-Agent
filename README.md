@@ -384,11 +384,6 @@ What responsibilities are included in this role?
 | Shaima |
 | Shahad |
 
----
-
-# 📜 License
-
-This project was developed for educational, academic, and applied AI engineering purposes.
 
 ---
 
