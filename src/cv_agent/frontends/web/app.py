@@ -28,6 +28,12 @@ try:
 except Exception:
     ask_ai = None
 
+try:
+    from cv_agent.services.rag_service import retrieve_job_context, load_job_description
+except Exception:
+    retrieve_job_context = None
+    load_job_description = None
+
 
 st.set_page_config(
     page_title="Moeen | AI CV-Agent",
@@ -131,6 +137,9 @@ def init_state():
 
     if "hr_result" not in st.session_state:
         st.session_state.hr_result = None
+
+    if "hr_job_requirements" not in st.session_state:
+        st.session_state.hr_job_requirements = ""
 
     if "candidate_about" not in st.session_state:
         st.session_state.candidate_about = False
@@ -756,7 +765,7 @@ def hr_portal():
             hr_jd_source = st.radio(
                 "Job Requirements Source",
                 ["Use ready template", "Write custom requirements"],
-                horizontal=True,
+                horizontal=False,
                 key="hr_jd_source"
             )
 
@@ -807,6 +816,7 @@ def hr_portal():
                             ai_results.append(result)
 
                         st.session_state.hr_result = build_hr_ai_result(ai_results)
+                        st.session_state.hr_job_requirements = job_requirements
 
                         if hr_email and send_summary_to_hr is not None:
                             send_summary_to_hr(
@@ -852,8 +862,7 @@ def hr_portal():
             st.subheader("💬 HR Intelligence Chat")
 
             with st.container(border=True):
-                st.write(f"**Moeen HR:** {result['best_reason']}")
-                hr_message = st.text_input("Ask about candidates...", key="hr_chat")
+                hr_message = st.text_input("Ask about candidates or the selected job offer...", key="hr_chat")
 
                 if st.button("Send HR Message", key="hr_chat_btn"):
                     if hr_message:
@@ -862,11 +871,33 @@ def hr_portal():
                         if ask_ai is not None:
                             hr_context = result.get("best_reason", "")
                             leaderboard_context = result.get("leaderboard", pd.DataFrame()).to_string(index=False)
+                            job_offer_map = {
+                                "Accountant": "accountant.txt",
+                                "HR": "hr.txt",
+                                "Information Technology": "information_technology.txt",
+                                "Teacher": "teacher.txt",
+                                "Data Analysis": "data_analyst.txt",
+                            }
+
+                            selected_offer_name = job_offer_map.get(hr_target_role, "data_analyst.txt")
+                            selected_offer_path = ROOT_DIR / "data" / "job_offers" / selected_offer_name
+
+                            if selected_offer_path.exists():
+                                retrieved_context = selected_offer_path.read_text(encoding="utf-8")
+                            elif retrieve_job_context is not None:
+                                retrieved_context = retrieve_job_context(hr_message)
+                            else:
+                                retrieved_context = st.session_state.get("hr_job_requirements", "")[:2500]
 
                             bot_reply = ask_ai(f"""
-You are Moeen HR, an AI recruiting assistant.
+You are Moeen HR, an AI recruiting assistant with lightweight RAG.
 
-Answer the HR user's question based on this candidate ranking and best-match report.
+Use the selected job offer context together with the candidate ranking result to answer the HR question.
+Answer ONLY based on the selected job offer and candidate analysis results.
+Do not invent requirements that are not mentioned in the selected job offer or the candidate results.
+
+Selected Job Offer Context:
+{retrieved_context}
 
 Candidate Leaderboard:
 {leaderboard_context}
@@ -877,7 +908,7 @@ Best Candidate Report:
 HR Question:
 {hr_message}
 
-Give a practical, specific, and concise recruiting answer.
+Give a practical, specific, and professional HR answer.
 """)
                         else:
                             bot_reply = f"{result.get('best_candidate', 'The top candidate')} is currently the strongest fit based on match score and role alignment."

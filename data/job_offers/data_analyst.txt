@@ -1,0 +1,43 @@
+Job Title: Data Analyst
+Company: Riyadh Digital Solutions
+Location: Riyadh, Saudi Arabia
+Employment Type: Full-Time
+Salary: 10,000 - 14,000 SAR per month
+
+Job Summary:
+Riyadh Digital Solutions is seeking a skilled Data Analyst to support business decision-making through data analysis, reporting, and visualization. The successful candidate will collect, clean, analyze, and interpret data from multiple sources to identify trends, generate insights, and support operational and strategic initiatives.
+
+Key Responsibilities:
+- Collect, clean, validate, and analyze data from multiple business sources.
+- Write SQL queries to extract, transform, and analyze datasets.
+- Build dashboards and reports using Power BI, Tableau, or similar tools.
+- Analyze trends, patterns, KPIs, and business performance indicators.
+- Prepare reports and visual presentations for stakeholders and management.
+- Support data quality checks, data validation, and documentation processes.
+- Collaborate with business, operations, and technical teams to understand reporting requirements.
+- Assist in automating reporting processes and improving data workflows.
+
+Required Qualifications:
+- Bachelor's degree in Computer Science, Information Systems, Data Science, Statistics, or a related field.
+- Strong knowledge of SQL and Excel.
+- Experience with Power BI, Tableau, or similar visualization tools.
+- Basic knowledge of Python for data analysis.
+- Understanding of data cleaning, reporting, and data validation concepts.
+- Strong analytical thinking and problem-solving skills.
+- Good communication skills and ability to explain insights clearly.
+
+Preferred Skills:
+- Experience with data governance or data quality concepts.
+- Familiarity with KPI reporting and statistical analysis.
+- Knowledge of databases and data warehousing concepts.
+- Experience working with large datasets and dashboards.
+
+Benefits:
+- Health insurance
+- Annual performance bonus
+- Professional training and development opportunities
+- Hybrid work flexibility
+- Paid annual leave
+
+HR Screening Notes:
+The strongest candidates should demonstrate practical experience in SQL, dashboard development, reporting, data cleaning, and business insights. Candidates with Power BI, Python, and data quality experience should be prioritized.
