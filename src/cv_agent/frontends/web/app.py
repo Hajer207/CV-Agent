@@ -183,6 +183,40 @@ JOB_ROLES = [
     "Healthcare Administrator"
 ]
 
+# Upload safety settings
+# Keep files reasonably small to avoid browser freezing during upload/processing.
+MAX_CV_SIZE_MB = 10
+MAX_HR_CVS = 5
+
+
+def validate_uploaded_file(uploaded_file, max_size_mb=MAX_CV_SIZE_MB):
+    """Return (is_valid, message) for an uploaded Streamlit file."""
+    if uploaded_file is None:
+        return False, "No file uploaded."
+
+    file_size_mb = uploaded_file.size / (1024 * 1024)
+
+    if file_size_mb > max_size_mb:
+        return (
+            False,
+            f"File '{uploaded_file.name}' is too large ({file_size_mb:.1f} MB). "
+            f"Please upload a file smaller than {max_size_mb} MB."
+        )
+
+    if not uploaded_file.name.lower().endswith((".pdf", ".docx")):
+        return False, f"File '{uploaded_file.name}' must be PDF or DOCX."
+
+    return True, ""
+
+
+def save_uploaded_file_to_temp(uploaded_file):
+    """Save uploaded file to a temporary path only after the user clicks Analyze/Ranking."""
+    suffix = ".pdf" if uploaded_file.name.lower().endswith(".pdf") else ".docx"
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
+        tmp_file.write(uploaded_file.getvalue())
+        return tmp_file.name
+
 
 def get_demo_candidate_result():
     return {
@@ -511,7 +545,19 @@ def candidate_portal():
         st.subheader("📥 Inputs")
 
         with st.container(border=True):
-            uploaded_cv = st.file_uploader("Upload your CV (PDF)", type=["pdf", "docx"])
+            uploaded_cv = st.file_uploader(
+                "Upload your CV (PDF or DOCX)",
+                type=["pdf", "docx"],
+                key="candidate_cv_uploader",
+                help=f"Recommended file size: under {MAX_CV_SIZE_MB} MB."
+            )
+
+            if uploaded_cv is not None:
+                is_valid_cv, cv_message = validate_uploaded_file(uploaded_cv)
+                if is_valid_cv:
+                    st.success(f"Selected: {uploaded_cv.name}")
+                else:
+                    st.error(cv_message)
 
             target_role = st.selectbox("Target Role", JOB_ROLES)
 
@@ -541,39 +587,41 @@ def candidate_portal():
             )
 
             if st.button("Start AI Analysis ✨", use_container_width=True):
-                if uploaded_cv and job_description:
-                    if Orchestrator is None:
-                        st.error("AI Orchestrator is not available. Please check import paths.")
-                        return
+                if not uploaded_cv or not job_description:
+                    st.warning("Please upload your CV and enter the job description.")
+                    return
 
-                    with st.spinner("Moeen AI is analyzing your CV..."):
-                        suffix = ".pdf" if uploaded_cv.name.lower().endswith(".pdf") else ".docx"
+                is_valid_cv, cv_message = validate_uploaded_file(uploaded_cv)
+                if not is_valid_cv:
+                    st.error(cv_message)
+                    return
 
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
-                            tmp_file.write(uploaded_cv.getbuffer())
-                            cv_path = tmp_file.name
+                if Orchestrator is None:
+                    st.error("AI Orchestrator is not available. Please check import paths.")
+                    return
 
-                        ai_result = Orchestrator().run_single(
-                            cv_path=cv_path,
-                            job_description=job_description,
-                            cv_id=uploaded_cv.name
+                with st.spinner("Moeen AI is analyzing your CV..."):
+                    cv_path = save_uploaded_file_to_temp(uploaded_cv)
+
+                    ai_result = Orchestrator().run_single(
+                        cv_path=cv_path,
+                        job_description=job_description,
+                        cv_id=uploaded_cv.name
+                    )
+
+                    ai_result = normalize_candidate_result(ai_result)
+                    st.session_state.candidate_result = ai_result
+
+                    if candidate_email and send_report_to_candidate is not None:
+                        send_report_to_candidate(
+                            candidate_email=candidate_email,
+                            candidate_name="Candidate",
+                            report=ai_result.get("report", ai_result.get("summary", "")),
+                            score=ai_result.get("score", 0)
                         )
 
-                        ai_result = normalize_candidate_result(ai_result)
-                        st.session_state.candidate_result = ai_result
-
-                        if candidate_email and send_report_to_candidate is not None:
-                            send_report_to_candidate(
-                                candidate_email=candidate_email,
-                                candidate_name="Candidate",
-                                report=ai_result.get("report", ai_result.get("summary", "")),
-                                score=ai_result.get("score", 0)
-                            )
-
-                    st.success("AI analysis completed successfully.")
-                    st.rerun()
-                else:
-                    st.warning("Please upload your CV and enter the job description.")
+                st.success("AI analysis completed successfully.")
+                st.rerun()
 
             if st.session_state.candidate_result is not None and candidate_email:
                 st.markdown(
@@ -759,10 +807,28 @@ def hr_portal():
 
         with st.container(border=True):
             uploaded_files = st.file_uploader(
-                "Upload Multiple CVs (PDFs)",
+                "Upload Multiple CVs (PDF or DOCX)",
                 type=["pdf", "docx"],
-                accept_multiple_files=True
+                accept_multiple_files=True,
+                key="hr_cv_uploader",
+                help=f"Upload up to {MAX_HR_CVS} CVs. Recommended file size: under {MAX_CV_SIZE_MB} MB each."
             )
+
+            if uploaded_files:
+                if len(uploaded_files) > MAX_HR_CVS:
+                    st.warning(f"Please upload up to {MAX_HR_CVS} CVs only to keep the app stable.")
+
+                invalid_files = []
+                for file in uploaded_files:
+                    is_valid_file, file_message = validate_uploaded_file(file)
+                    if not is_valid_file:
+                        invalid_files.append(file_message)
+
+                if invalid_files:
+                    for message in invalid_files:
+                        st.error(message)
+                else:
+                    st.success(f"{len(uploaded_files)} file(s) selected successfully.")
 
             hr_target_role = st.selectbox("Target Role", JOB_ROLES, key="hr_target_role")
 
@@ -793,47 +859,60 @@ def hr_portal():
             )
 
             if st.button("Run Smart Ranking 🚀", use_container_width=True):
-                if uploaded_files and job_requirements:
-                    if Orchestrator is None:
-                        st.error("AI Orchestrator is not available. Please check import paths.")
-                        return
-
-                    with st.spinner("Moeen AI is ranking candidates..."):
-                        ai_results = []
-
-                        for uploaded_file in uploaded_files:
-                            suffix = ".pdf" if uploaded_file.name.lower().endswith(".pdf") else ".docx"
-
-                            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
-                                tmp_file.write(uploaded_file.getbuffer())
-                                cv_path = tmp_file.name
-
-                            result = Orchestrator().run_single(
-                                cv_path=cv_path,
-                                job_description=job_requirements,
-                                cv_id=uploaded_file.name
-                            )
-
-                            if isinstance(result, dict):
-                                result["cv_id"] = uploaded_file.name
-
-                            ai_results.append(result)
-
-                        st.session_state.hr_result = build_hr_ai_result(ai_results)
-                        st.session_state.hr_job_requirements = job_requirements
-
-                        if hr_email and send_summary_to_hr is not None:
-                            send_summary_to_hr(
-                                hr_email=hr_email,
-                                candidate_name=st.session_state.hr_result.get("best_candidate", "Best Candidate"),
-                                report=st.session_state.hr_result.get("best_reason", "No report available."),
-                                score=st.session_state.hr_result.get("top_match", 0),
-                            )
-
-                    st.success("AI ranking completed successfully.")
-                    st.rerun()
-                else:
+                if not uploaded_files or not job_requirements:
                     st.warning("Please upload CVs and enter job requirements.")
+                    return
+
+                if len(uploaded_files) > MAX_HR_CVS:
+                    st.error(f"Please upload up to {MAX_HR_CVS} CVs only.")
+                    return
+
+                invalid_files = []
+                for uploaded_file in uploaded_files:
+                    is_valid_file, file_message = validate_uploaded_file(uploaded_file)
+                    if not is_valid_file:
+                        invalid_files.append(file_message)
+
+                if invalid_files:
+                    for message in invalid_files:
+                        st.error(message)
+                    return
+
+                if Orchestrator is None:
+                    st.error("AI Orchestrator is not available. Please check import paths.")
+                    return
+
+                with st.spinner("Moeen AI is ranking candidates..."):
+                    ai_results = []
+                    orchestrator = Orchestrator()
+
+                    for uploaded_file in uploaded_files:
+                        cv_path = save_uploaded_file_to_temp(uploaded_file)
+
+                        result = orchestrator.run_single(
+                            cv_path=cv_path,
+                            job_description=job_requirements,
+                            cv_id=uploaded_file.name
+                        )
+
+                        if isinstance(result, dict):
+                            result["cv_id"] = uploaded_file.name
+
+                        ai_results.append(result)
+
+                    st.session_state.hr_result = build_hr_ai_result(ai_results)
+                    st.session_state.hr_job_requirements = job_requirements
+
+                    if hr_email and send_summary_to_hr is not None:
+                        send_summary_to_hr(
+                            hr_email=hr_email,
+                            candidate_name=st.session_state.hr_result.get("best_candidate", "Best Candidate"),
+                            report=st.session_state.hr_result.get("best_reason", "No report available."),
+                            score=st.session_state.hr_result.get("top_match", 0),
+                        )
+
+                st.success("AI ranking completed successfully.")
+                st.rerun()
 
             if st.session_state.hr_result is not None and hr_email:
                 st.markdown(

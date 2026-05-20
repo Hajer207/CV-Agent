@@ -1,5 +1,5 @@
 # ✨ Moeen | معين  
-### **Agentic AI Recruitment Intelligence & Context-Aware RAG Platform**
+# Multi-Agent AI Recruitment Intelligence Platform
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python">
@@ -9,234 +9,137 @@
 </p>
 
 <p align="center">
- Intelligent AI-powered recruitment platform combining <b>Agentic AI</b>, <b>Multi-Job RAG</b>, candidate intelligence, and HR automation.
+  Intelligent AI-powered recruitment platform combining <b>Multi-Agent AI</b>, <b>Context-Aware RAG</b>, candidate intelligence, and recruitment automation.
 </p>
 
 ---
 
-# 🎯 Project Overview
+# 🚀 Project Overview
 
-**Moeen (معين)** is an enterprise-grade AI recruitment intelligence platform designed to modernize and automate the hiring workflow for both recruiters and job seekers.
+**Moeen (معين)** is a modern AI-powered recruitment intelligence platform designed to support both recruiters and job seekers through autonomous multi-agent workflows and context-aware AI assistance.
 
-Traditional recruitment processes often suffer from:
-- Manual CV screening bottlenecks
-- Inconsistent candidate evaluation
-- Time-consuming shortlisting
-- Limited recruitment intelligence
-- Generic chatbot responses disconnected from real job requirements
-
-Moeen solves these challenges through a modern **Agentic AI architecture** combined with a **Multi-Job Retrieval-Augmented Generation (RAG)** system.
-
-The platform automates:
-- CV parsing and analysis
-- Candidate ranking
-- Skills gap detection
-- Recruitment insights generation
-- Role-specific HR conversations
-- Context-aware recruitment intelligence
+The platform transforms traditional recruitment processes into an intelligent AI-driven pipeline capable of:
+- Automating CV analysis
+- Evaluating candidate-job compatibility
+- Ranking applicants intelligently
+- Generating recruitment insights
+- Providing AI-powered career assistance
+- Supporting context-aware HR conversations using RAG
 
 ---
 
-# 🚀 Core System Features
+# 🧠 Multi-Agent AI Architecture
 
-## 👤 Job Seeker Portal
-
-- 📄 Intelligent CV Parsing (`PDF` / `DOCX`)
-- 📊 AI-Powered Match Scoring
-- 🧠 Skills & Missing Skills Detection
-- 🎯 Personalized Improvement Recommendations
-- 💬 AI-Generated Interview Questions
-- 📧 Automated Email Reports
-- 📈 Candidate Readiness Insights
+Moeen operates through a modular multi-agent architecture where specialized AI agents collaborate through a centralized orchestration pipeline.
 
 ---
 
-## 💼 HR & Recruiter Portal
-
-- 📂 Multi-CV Upload Engine
-- 🏆 Dynamic Candidate Leaderboard
-- 🤖 HR Intelligence Chatbot
-- 📊 Recruitment Insights & Recommendations
-- 🎯 Candidate-to-Role Alignment Analysis
-- 🔎 Context-Aware Multi-Job RAG Retrieval
-- ⚡ Real-Time Candidate Comparison
-
----
-
-# 🧠 High-Level Agentic Workflow
+# ⚡ High-Level Agentic Workflow
 
 ```text
-       ┌────────────────────────────────────────────────────────┐
-       │                 User Upload / Input                    │
-       └───────────────────────────┬────────────────────────────┘
-                                   │
-                                   ▼
-                   ┌───────────────────────────────┐
-                   │        Parser Agent           │
-                   │      (Text Extraction)        │
-                   └───────────────┬───────────────┘
-                                   │
-                                   ▼
-                   ┌───────────────────────────────┐
-                   │       Analyzer Agent          │
-                   │   (Skills & Profile Analysis) │
-                   └───────────────┬───────────────┘
-                                   │
-                                   ▼
-                   ┌───────────────────────────────┐
-                   │        Matcher Agent          │
-                   │    (Scoring & Benchmarking)  │
-                   └───────────────┬───────────────┘
-                                   │
-                                   ▼
-        ┌───────────────────────────────────────────────────────┐
-        │                 Orchestration Layer                   │
-        └───────┬───────────────────────────────────────┬───────┘
-                │                                       │
-                ▼                                       ▼
-   ┌───────────────────────────┐           ┌───────────────────────────┐
-   │ Candidate Intelligence    │           │ Candidate Leaderboard     │
-   │ & Interview Generation    │           │ & Hiring Insights         │
-   └───────────────────────────┘           └────────────┬──────────────┘
-                                                        │
-                                                        ▼
-                                           ┌───────────────────────────┐
-                                           │    RAG Retrieval Agent    │
-                                           │  (Dynamic Context Switch) │
-                                           └────────────┬──────────────┘
-                                                        │
-                                                        ▼
-                                           ┌───────────────────────────┐
-                                           │  HR Intelligence Agent    │
-                                           │ (Grounded AI Chatbot)     │
-                                           └───────────────────────────┘
+Upload CV / User Input
+        ↓
+Parser Agent 📄
+(Text Extraction & Processing)
+        ↓
+Analyzer Agent 🧠
+(Semantic CV Intelligence)
+        ↓
+Matcher Agent 🎯
+(Candidate Scoring & Role Alignment)
+        ↓
+Orchestration Layer ⚙️
+(Agent Coordination)
+        ↓
+Recruitment Intelligence Agent 💬
+(Context-Aware AI Assistance)
+        ↓
+Final Insights & Recommendations ✅
 ```
 
 ---
 
-# 🤖 Core AI Agents
+# 🤖 Specialized AI Agents
 
-## 🧠 CV Analysis Agent
-Responsible for:
-- Extracting structured resume text
-- Detecting technical and soft skills
-- Identifying missing competencies
-- Generating match scores
-- Building candidate intelligence profiles
+## 📄 Parser Agent
+- Extracting text from PDF/DOCX resumes
+- Processing uploaded files
+- Preparing CV content for AI analysis
 
 ---
 
-## 📊 Candidate Ranking Agent
-Responsible for:
-- Comparing applicants
-- Evaluating candidate-job alignment
-- Ranking candidates dynamically
-- Generating hiring insights
-- Supporting HR decision-making
+## 🧠 Analyzer Agent
+- Semantic resume analysis
+- Technical and soft skill detection
+- Missing skills identification
+- AI-powered recommendations
+
+---
+
+## 🎯 Matcher Agent
+- Candidate-job alignment scoring
+- Dynamic candidate ranking
+- Recruitment intelligence scoring
 
 ---
 
 ## 🔎 RAG Retrieval Agent
-Responsible for:
-- Retrieving role-specific job offer context
-- Dynamically switching operational contexts
+- Retrieving role-specific job context
+- Injecting contextual information into prompts
 - Reducing hallucination
-- Injecting retrieved context into AI prompts
-- Grounding chatbot responses using real documents
+- Grounding AI chatbot responses
 
 ---
 
-## 💬 HR Intelligence Agent
-Responsible for:
-- Answering recruiter questions
-- Generating professional HR reasoning
-- Explaining candidate suitability
-- Producing context-aware responses
-- Supporting recruitment decisions
+## 💬 Recruitment Intelligence Agent
+- Supporting recruiter interactions
+- Producing hiring insights
+- Context-aware AI responses
 
 ---
 
-# 🔎 Multi-Job RAG Architecture
+# 👤 Job Seeker Portal
 
-To reduce hallucination and improve response accuracy, Moeen uses a **Multi-Job Retrieval-Augmented Generation (RAG)** workflow.
-
-Instead of relying only on static LLM memory, the system dynamically retrieves real job-offer documents based on the selected role before generating responses.
-
-## 📁 Job Offer Repository
-
-```text
-data/job_offers/
-```
-
-### Supported Roles
-
-- 📊 Data Analyst
-- 💰 Accountant
-- 👩‍💼 HR Specialist
-- 💻 Information Technology
-- 👩‍🏫 Teacher
-
-### Example Files
-
-```text
-data_analyst.txt
-accountant.txt
-hr.txt
-information_technology.txt
-teacher.txt
-```
+- 📄 Intelligent CV Parsing
+- 📊 AI-Powered Match Score
+- 🧠 Skills Gap Detection
+- 🎯 Personalized Recommendations
+- 💬 AI-Generated Interview Questions
+- 📧 Automated Email Reports
 
 ---
 
-# ⚡ RAG Execution Pipeline
+# 💼 HR & Recruiter Portal
 
-### 1️⃣ Role Selection
-Recruiter selects a target operational role.
-
-### 2️⃣ Context Retrieval
-The system dynamically retrieves the matching job-offer document.
-
-### 3️⃣ Prompt Injection
-Retrieved requirements, salary information, and responsibilities are injected into the AI prompt.
-
-### 4️⃣ Grounded Response Generation
-The chatbot answers only using the retrieved job context.
-
-If information is unavailable, the system explicitly states:
-
-> “Information not found within the selected job profile documents.”
-
-This prevents unsupported hallucinated answers.
+- 📂 Multi-CV Upload Engine
+- 🏆 Dynamic Candidate Leaderboard
+- 🤖 Recruitment Intelligence Assistant
+- 📊 Recruitment Insights & Recommendations
+- 🔎 Context-Aware Multi-Job RAG Retrieval
 
 ---
 
-# 🎯 Business Impact
+# 🔎 Context-Aware RAG Architecture
 
-Moeen significantly improves recruitment workflows by reducing manual screening effort and increasing hiring intelligence.
+The platform dynamically retrieves real job description documents before generating AI responses.
 
-The platform enhances:
-- ⚡ Recruitment efficiency
-- 📊 Candidate evaluation quality
-- 🤖 HR automation
-- 🧠 Context-aware decision support
-- 🎯 Candidate-job alignment
-- 📈 Recruitment scalability
-
-By combining Agentic AI workflows with Multi-Job RAG retrieval, Moeen creates a modern AI-powered hiring ecosystem.
+This helps:
+- Reduce hallucination
+- Improve response accuracy
+- Ground chatbot responses
 
 ---
 
-# 🛠️ Tech Stack & Dependencies
+# 🛠️ Technologies Used
 
 | Category | Technologies |
 |---|---|
 | Programming Language | Python 3.11 |
 | Frontend Framework | Streamlit |
 | AI Engine | OpenAI API |
+| LLM Model | GPT-4o-mini |
 | Data Processing | Pandas & NumPy |
-| CV Parsing | PyPDF2 / Docx2txt |
-| AI Architecture | Agentic AI + RAG |
-| Communication Layer | SMTP Email Integration |
+| AI Architecture | Multi-Agent AI + RAG |
 | Version Control | Git & GitHub |
 
 ---
@@ -247,90 +150,22 @@ By combining Agentic AI workflows with Multi-Job RAG retrieval, Moeen creates a 
 CV-Agent/
 │
 ├── data/
-│   ├── cvs/
-│   ├── job_descriptions/
-│   └── job_offers/
-│
-├── dataset/
-│   ├── Job_description_dataset/
-│   └── Resume_Dataset/
-│
 ├── src/
 │   └── cv_agent/
 │       ├── agents/
-│       ├── frontends/
-│       │   └── web/
-│       │       └── app.py
 │       ├── services/
+│       ├── frontends/
 │       ├── config.py
 │       └── model.py
 │
 ├── requirements.txt
 ├── README.md
-├── .env
-└── .gitignore
+└── .env
 ```
 
 ---
 
-# ⚙️ Installation & Setup
-
-## 1️⃣ Clone Repository
-
-```bash
-git clone <repository_url>
-cd CV-Agent
-```
-
----
-
-## 2️⃣ Create Virtual Environment
-
-```bash
-py -3.11 -m venv .venv
-```
-
----
-
-## 3️⃣ Activate Environment
-
-### Windows PowerShell
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-### Linux / macOS
-
-```bash
-source .venv/bin/activate
-```
-
----
-
-## 4️⃣ Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 5️⃣ Configure Environment Variables
-
-Create a `.env` file:
-
-```env
-OPENAI_API_KEY=your_openai_api_key
-MODEL_NAME=gpt-4o-mini
-
-EMAIL_ADDRESS=your_email@gmail.com
-EMAIL_PASSWORD=your_app_password
-```
-
----
-
-## 6️⃣ Run Application
+# ⚙️ Run Application
 
 ```bash
 streamlit run src/cv_agent/frontends/web/app.py
@@ -338,55 +173,43 @@ streamlit run src/cv_agent/frontends/web/app.py
 
 ---
 
-# 💬 Example HR Questions
+# 🎯 Business Impact
 
-```text
-What is the salary range for this role?
-```
-
-```text
-Does this role require SAP experience?
-```
-
-```text
-What skills should the strongest candidate have?
-```
-
-```text
-Does this role require Power BI experience?
-```
-
-```text
-What responsibilities are included in this role?
-```
+Moeen improves:
+- Recruitment efficiency
+- Candidate evaluation quality
+- AI-powered hiring intelligence
+- HR automation
+- Candidate-job alignment
 
 ---
 
 # 📌 Future Roadmap
 
-- [ ] Semantic Vector Retrieval (ChromaDB / Pinecone)
-- [ ] Arabic NLP Support
-- [ ] Embedding-Based Candidate Matching
-- [ ] Admin Analytics Dashboard
-- [ ] Custom Job Offer Uploading
-- [ ] Advanced Hiring Metrics Visualization
-- [ ] Database Integration
-- [ ] Fine-Tuned Recruitment Models
+- Semantic Vector Retrieval
+- Arabic NLP Support
+- Embedding-Based Matching
+- Analytics Dashboard
+- Database Integration
+- Fine-Tuned Recruitment Models
 
 ---
 
 # 👩‍💻 Development Team
 
-| Developer |
-|---|
-| Hajer |
-| Seba |
-| Shaima |
-| Shahad |
-
+- Hajer
+- Seba
+- Shaima
+- Shahad
 
 ---
 
 # ✨ Final Statement
 
-**Moeen (معين)** represents a modern AI-driven recruitment ecosystem that combines Agentic AI workflows, Multi-Job RAG retrieval, and recruitment intelligence into one scalable platform capable of supporting both recruiters and job seekers through intelligent automation.
+**Moeen (معين)** combines autonomous multi-agent workflows, context-aware RAG retrieval, recruitment intelligence, and AI-driven automation into one scalable recruitment ecosystem.
+
+---
+
+# 💚 Moeen | مُعين
+
+### Empowering Recruitment with Multi-Agent Artificial Intelligence ✨
